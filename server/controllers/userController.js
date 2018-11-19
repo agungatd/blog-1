@@ -10,8 +10,7 @@ class UserController {
       email: req.body.email,
       password: req.body.password
     }
-    let user = new User(data)
-    user.save()
+    User.create(data)
       .then(data => {
         res.status(201).json({
           status: `success`,
@@ -20,7 +19,7 @@ class UserController {
       })
       .catch(err => {
         res.status(500).json({
-          status: `failed create account`,
+          status: `failed`,
           message: err
         })
       })

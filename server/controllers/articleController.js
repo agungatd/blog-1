@@ -207,6 +207,19 @@ class ArticleController {
     });
   }
 
+  static getPopular(req, res) {
+    Article.find({})
+    .populate('author')
+    .limit(5)
+    .sort({views:-1})
+    .then((result) => {
+      console.log( 'get populars:', result)
+      res.status(200).json(result)
+    }).catch((err) => {
+      res.status(500).json(err)
+    });
+  }
+
 }
 
 module.exports = ArticleController

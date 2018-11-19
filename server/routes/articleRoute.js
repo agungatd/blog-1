@@ -10,5 +10,6 @@ route.put('/:id', isLogin, ArticleController.updateArticle)
 route.put('/add-views/:id', ArticleController.updateViews)
 route.delete('/:id', isLogin, ArticleController.deleteArticle)
 route.post('/text-to-speech', ArticleController.getSpeech)
+route.get('/popular', ArticleController.getPopular)
 
 module.exports = route

@@ -25,6 +25,7 @@
       </div>
       <div class="side-bar col-md-3">
         <SideBar :isLogin='isLogin' :getDate='getDate' ></SideBar>
+        <Popular :isLogin='isLogin' :getDate='getDate' />
       </div>
     </div>
   </div>
@@ -34,6 +35,7 @@
 // @ is an alias to /src
 import MainContaint from "@/components/mainContaint.vue";
 import SideBar from "@/components/sideBar.vue";
+import Popular from "@/components/popular.vue"
 
 export default {
   props: ['isLogin', 'getDate'],
@@ -51,7 +53,7 @@ export default {
     
   },
   components: { 
-    MainContaint, SideBar
+    MainContaint, SideBar, Popular
   },
   methods: {
     getRandomArticle() {

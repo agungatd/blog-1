@@ -4,17 +4,32 @@ const bcrypt = require('bcryptjs')
 
 const userSchema = new Schema({
   username:  {
-      type :String,
-      required : true
+    type :String,
+    required: [true, 'First name required'],
+    validate: {
+        validator() {
+            if (this.username.length < 3) {
+                throw new Error('First name length must be greater than 2')
+            }
+        }
+    }
   },
   email: {
       type : String,
-      unique : true,
-      required : true
+      required: [true, 'Email required'],
+      unique: true,
+      validate: {
+        validator() {
+          let patt = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/)
+          if (!patt.test(this.email)) {
+            throw new Error('Email is invalid')
+          }
+        }
+      }
   },
   password: {
     type : String,
-    required : true,
+    required : [true, 'Password required'],
     validate : {
         validator (val) {
             if (val.length >= 6) {
