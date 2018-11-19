@@ -15,8 +15,8 @@ Vue.config.productionTip = false
 
 // Vue.prototype.$textToSpeechClient = new textToSpeech.TextToSpeechClient();
 
-Vue.prototype.$server = `http://localhost:3000`
-Vue.prototype.$host = `http://localhost:8080`
+Vue.prototype.$server = `https://my-blog.agungatidhira.tech`
+Vue.prototype.$host = `https://blogging-web.firebaseapp.com`
 
 Vue.prototype.$serverUser = axios.create({
   baseUrl: `http://localhost:3000/users`

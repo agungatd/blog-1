@@ -9,7 +9,7 @@
         <label for="exampleInputPassword1">Password</label>
         <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" v-model='password'>
       </div>
-      <h6>Does not have an account yet?&nbsp;<span id='register'data-toggle="modal" data-target="#registerModal">Register</span></h6>
+      <h6>Does not have an account yet?&nbsp;<span id='register' data-toggle="modal" data-target="#registerModal">Register</span></h6>
         <div class="alert alert-success" role="alert" v-if='success'>
           yes {{ msg }}
         </div>
