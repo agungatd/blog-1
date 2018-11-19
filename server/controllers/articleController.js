@@ -1,3 +1,4 @@
+require('dotenv').config()
 const Article = require('../models/articleModel')
 const dateHelper = require('../helpers/dateHelper')
 const textToSpeech = require('@google-cloud/text-to-speech')
@@ -177,6 +178,8 @@ class ArticleController {
 
   static getSpeech(req, res) {
     const fs = require('fs');
+    const http = require('http');
+    const path = require('path');
     const client = new textToSpeech.TextToSpeechClient();
     const request = {
       input: {text: req.body.text},
@@ -186,13 +189,13 @@ class ArticleController {
       audioConfig: {audioEncoding: 'MP3'},
     };
     let outputFile = 'output.mp3'
-
+    // let path = `/path/to/file/${outputFile}`
     client.synthesizeSpeech(request, (err, response) => {
       if (err) {
         console.error('ERROR:', err);
         return;
       }
-      res.status(201).json({data: response.audioContent})
+      // res.status(201).json({data: response.audioContent})
 
       fs.writeFile(outputFile, response.audioContent, 'binary', err => {
           if (err) {
@@ -200,9 +203,22 @@ class ArticleController {
             return;
           }
           console.log(`Audio content written to file: ${outputFile}`);
-          fs.readFile(outputFile, 'binary', function(err, buf) {
-            console.log(buf.toString());
-          });
+
+          // test send to client
+          http.createServer(function(request, response) {
+            var filePath = path.join(__dirname, outputFile);
+            var stat = fs.statSync(filePath);
+        
+            response.writeHead(200, {
+                'Content-Type': 'audio/mpeg',
+                'Content-Length': stat.size
+            });
+        
+            var readStream = fs.createReadStream(filePath);
+            // We replaced all the event handlers with a simple call to readStream.pipe()
+            readStream.pipe(response);
+        })
+
         });
     });
   }
