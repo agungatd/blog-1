@@ -8,75 +8,114 @@ const User = require("../models/userModel");
 chai.use(chaiHttp);
 
 // ======================= ARTICLES
+const Article = require('../models/articleModel')
 
-describe('Create Article', function () {
+const userDataDummy = {
+    _id : '',
+    username: 'agung',
+    email : 'agung@mail.com',
+    password : 'asdasd123',
+    token : ''
+}
 
-  it(' POST on URL : /articles', function (done) {
-      chai.request(app)
-      .post('/articles')
-      .set("authorization", `Bearer ${userDataDummy.token}`)
-      .send({
-          title: 'Testing Dev',
-          content: `It's all about testing driven development`
-      })
-      .end(function (err, res) {     
-          expect(res).to.have.status(201);
-          expect(res.body.status).to.equal('success');
-          expect(res.body.message).to.equal('success when creating article');
-          done()
-      });
-  });
-});
-
-describe('Update Article by Id', function () {
-
-  before(function (done) {
-      let newArticle = {
-          title : 'Test Driven Development',
-          author : userDataDummy._id,
-          content : 'Testing app to make sure all code run properly'
-      }
-      let article = new Article(newArticle)
+describe('Articles Route', function() {
+    beforeEach(function () {
+        let dataNewUser = {
+          username: "agung",
+          email: "agung@mail.com",
+          password: "asdasd123"
+        }
   
-      article.save()
-      .then(data => { 
-          userDataDummy.ArticleDummyId = data._id
-          done()
-      })
-      .catch(err => {
-          done()
-          console.log('\n> error when creating article\n');
-      })
-  })
+        let user = new User(dataNewUser)
+  
+        return new Promise(resolve => {
+          user.save().then(data => {
+            userDataDummy._id = data._id
+            userDataDummy.token = jwt.sign({
+              id: data._id,
+              username: data.username
+            }, process.env.JWT_SECRET)
+            resolve()
+          }).catch(err=>{
+              console.log(err)
+          })
+        })
+  
+    });
 
-  it(' PUT on URL : /articles/:id', function (done) {
+    afterEach(function () {
+        User.deleteOne({email:'agung@mail.com'}).then(data => {})
+    })
+    describe('Create Article', function () {
+            
+        it(' POST on URL : /articles', function (done) {
+            chai.request(app)
+            .post('/articles')
+            .set("authorization", `Bearer ${userDataDummy.token}`)
+            .send({
+                title: 'Testing Dev',
+                content: `It's all about testing driven development`
+            })
+            .end(function (err, res) {     
+                expect(res).to.have.status(201);
+                expect(res.body.status).to.equal('success');
+                expect(res.body.message).to.equal('success when creating article');
+                done()
+            });
+        });
+    });
+    
+    describe('Update Article by Id', function () {
+    
+      before(function (done) {
+          let newArticle = {
+              title : 'Test Driven Development',
+              author : userDataDummy._id,
+              content : 'Testing app to make sure all code run properly'
+          }
+          let article = new Article(newArticle)
       
-      chai.request(app)
-      .put(`/articles/${userDataDummy.ArticleDummyId}`)
-      .set("authorization", `Bearer ${userDataDummy.token}`)
-      .send({
-          title: 'Testing Driven Dev',
-          content: `It's all about testing driven development`
+          article.save()
+          .then(data => { 
+              userDataDummy.ArticleDummyId = data._id
+              done()
+          })
+          .catch(err => {
+              done()
+              console.log('\n> error when creating article\n');
+          })
       })
-      .end(function (err, res) {
-          expect(res).to.have.status(200);
-          expect(res.body.status).to.equal('success');
-          expect(res.body.message).to.equal('sucess when update article');
-          done()
+    
+      it(' PUT on URL : /articles/:id', function (done) {
+          
+          chai.request(app)
+          .put(`/articles/${userDataDummy.ArticleDummyId}`)
+          .set("authorization", `Bearer ${userDataDummy.token}`)
+          .send({
+              title: 'Testing Driven Dev',
+              content: `It's all about testing driven development`
+          })
+          .end(function (err, res) {
+              expect(res).to.have.status(200);
+              expect(res.body.status).to.equal('success');
+              expect(res.body.message).to.equal('sucess when update article');
+              done()
+          });
       });
-  });
-});
-
-describe('Find All Article', function () {
-
-  it(' GET on URL : /articles', function (done) {
-      chai.request(app)
-      .get('/articles')
-      .end(function (err, res) {   
-          expect(res).to.have.status(200);
-          expect(res.body.status).to.equal('success');
-          expect(res.body.data).to.be.an('array');
-          done()
+    });
+    
+    describe('Find All Article', function () {
+    
+      it(' GET on URL : /articles', function (done) {
+          chai.request(app)
+          .get('/articles')
+          .end(function (err, res) {   
+              expect(res).to.have.status(200);
+              expect(res.body.status).to.equal('success');
+              expect(res.body.data).to.be.an('array');
+              done()
+          });
       });
-  });
-});
+    });
+
+})

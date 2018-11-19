@@ -5,11 +5,11 @@ const bcrypt = require('bcryptjs')
 const userSchema = new Schema({
   username:  {
     type :String,
-    required: [true, 'First name required'],
+    required: [true, 'Username required'],
     validate: {
         validator() {
             if (this.username.length < 3) {
-                throw new Error('First name length must be greater than 2')
+                throw new Error('Username length must be greater than 2')
             }
         }
     }
@@ -31,11 +31,9 @@ const userSchema = new Schema({
     type : String,
     required : [true, 'Password required'],
     validate : {
-        validator (val) {
-            if (val.length >= 6) {
-                return true
-            } else {
-                return false
+        validator () {
+            if (this.password.length < 6) {
+                throw new Error('Password length must be greater than 6')
             }
         }
     }

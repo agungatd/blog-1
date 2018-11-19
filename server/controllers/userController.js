@@ -14,14 +14,47 @@ class UserController {
       .then(data => {
         res.status(201).json({
           status: `success`,
-          message: `creating user success`
+          message: `success creating new account with email ${data.email}`,
+          data
         })
       })
       .catch(err => {
-        res.status(500).json({
-          status: `failed`,
-          message: err
-        })
+        if(err.message == 'User validation failed: username: Username required') {
+          res.status(500).json({
+            status: `failed`,
+            message: 'Username required'
+          })
+        } else if(err.message == 'User validation failed: email: Email required') {
+          res.status(500).json({
+            status: `failed`,
+            message: 'Email required'
+          })
+        } else if(err.message == 'User validation failed: password: Password required') {
+          res.status(500).json({
+            status: `failed`,
+            message: 'Password required'
+          })
+        } else if(err.message == 'User validation failed: password: Password length must be greater than 6') {
+          res.status(500).json({
+            status: `failed`,
+            message: 'Password length must be greater than 6'
+          })
+        } else if(err.message == 'User validation failed: email: Email is invalid') {
+          res.status(500).json({
+            status: `failed`,
+            message: 'Email is invalid'
+          })
+        } else if(err.message== 'User validation failed: username: Username length must be greater than 2') {
+          res.status(500).json({
+            status: `failed`,
+            message: 'Username length must be greater than 2'
+          })
+        } else if(err.errmsg.indexOf('email_1 dup key') != -1) {
+          res.status(500).json({
+            status: `failed`,
+            message: 'Email is already taken'
+          })
+        }
       })
   }
 
@@ -54,7 +87,7 @@ class UserController {
             })
           }
         } else {
-          res.status(403).json({
+          res.status(404).json({
             status: `failed`,
             message: `login failed, user not found`
           })
@@ -66,6 +99,18 @@ class UserController {
           message: `error when log-in user`
         })
       })
+  }
+
+  static getAllUsers(req, res) {
+    User.find({})
+    .then((data) => {
+      res.status(200).json({
+        status: 'success',
+        data
+      })
+    }).catch((err) => {
+      
+    });
   }
 
   static getAllFollowers(req, res) {

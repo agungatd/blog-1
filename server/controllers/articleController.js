@@ -178,7 +178,6 @@ class ArticleController {
 
   static getSpeech(req, res) {
     const fs = require('fs');
-    const http = require('http');
     const path = require('path');
     const client = new textToSpeech.TextToSpeechClient();
     const request = {
@@ -190,34 +189,21 @@ class ArticleController {
     };
     let outputFile = 'output.mp3'
     // let path = `/path/to/file/${outputFile}`
-    client.synthesizeSpeech(request, (err, response) => {
+    client.synthesizeSpeech(request, (err, result) => {
       if (err) {
         console.error('ERROR:', err);
         return;
       }
-      // res.status(201).json({data: response.audioContent})
-
-      fs.writeFile(outputFile, response.audioContent, 'binary', err => {
-          if (err) {
-            console.error('ERROR:', err);
+      
+      fs.writeFile(outputFile, result.audioContent, 'binary', err => {
+        if (err) {
+          console.error('ERROR:', err);
             return;
           }
           console.log(`Audio content written to file: ${outputFile}`);
-
-          // test send to client
-          http.createServer(function(request, response) {
-            var filePath = path.join(__dirname, outputFile);
-            var stat = fs.statSync(filePath);
-        
-            response.writeHead(200, {
-                'Content-Type': 'audio/mpeg',
-                'Content-Length': stat.size
-            });
-        
-            var readStream = fs.createReadStream(filePath);
-            // We replaced all the event handlers with a simple call to readStream.pipe()
-            readStream.pipe(response);
-        })
+          
+          res.status(200).json({message:'success write file',text:req.body.text})
+          // test send to clie
 
         });
     });

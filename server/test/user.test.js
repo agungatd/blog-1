@@ -35,7 +35,7 @@ describe("Register Validation User", () => {
           expect(res).to.have.status(500);
           expect(res.body).to.have.property("status");
           expect(res.body).to.have.property("message");
-          expect(res.body.message).to.equal("username required");
+          expect(res.body.message).to.equal("Username required");
           expect(res.body.status).to.equal("failed");
           done();
         });
@@ -86,7 +86,7 @@ describe("Register Validation User", () => {
           expect(res.body).to.have.property("status");
           expect(res.body).to.have.property("message");
           expect(res.body.message).to.equal(
-            "Password length must be greater than 5"
+            "Password length must be greater than 6"
           );
           expect(res.body.status).to.equal("failed");
           done();
@@ -137,7 +137,7 @@ describe("Register Validation User", () => {
           expect(res.body).to.have.property("status");
           expect(res.body).to.have.property("message");
           expect(res.body.message).to.equal(
-            "First name length must be greater than 2"
+            "Username length must be greater than 2"
           );
           expect(res.body.status).to.equal("failed");
           done();
@@ -177,13 +177,10 @@ describe("Register create data", () => {
           expect(res.body).to.have.property("message");
           expect(res.body).to.have.property("data");
           expect(res.body.data).to.have.property("username");
-          expect(res.body.data).to.have.property("lname");
           expect(res.body.data).to.have.property("email");
           expect(res.body.data).to.have.property("password");
           expect(res.body.data.username).to.equal(dataNewUser.username);
-          expect(res.body.data.lname).to.equal(dataNewUser.lname);
           expect(res.body.data.email).to.equal(dataNewUser.email);
-          expect(res.body.data.password).to.equal(dataNewUser.password);
           expect(res.body.status).to.equal("success");
           expect(res.body.message).to.equal(
             `success creating new account with email ${dataNewUser.email}`
@@ -222,7 +219,7 @@ describe('Registration with same email', () => {
           expect(res.body).to.have.property("status");
           expect(res.body).to.have.property("message");
           expect(res.body.status).to.equal("failed");
-          expect(res.body.message).to.equal("Email already taken");
+          expect(res.body.message).to.equal("Email is already taken");
           done()
         })
     }).timeout(500)
@@ -237,7 +234,7 @@ describe("Login Verification", () => {
     }
 
     after(function () {
-      User.deleteMany({}).then(data => {})
+      User.deleteOne({email:'agung@mail.com'}).then(data => {})
     })
 
     before(function () {
@@ -259,11 +256,11 @@ describe("Login Verification", () => {
         .post("/users/login")
         .send(dataLogin)
         .end((err, res) => {
-          expect(res).to.have.status(500);
+          expect(res).to.have.status(406);
           expect(res.body).to.have.property('status');
           expect(res.body).to.have.property('message');
           expect(res.body.status).to.equal('failed');
-          expect(res.body.message).to.equal('wrong password or email');
+          expect(res.body.message).to.equal('login failed, wrong password or email');
           done();
         });
     })
@@ -273,7 +270,7 @@ describe("Login Verification", () => {
         .request(app)
         .post("/users/login")
         .send({
-          email: 'gstandryeanz@mail.com',
+          email: 'xxx@mail.com',
           password: 'asdasd123'
         })
         .end((err, res) => {
@@ -281,7 +278,7 @@ describe("Login Verification", () => {
           expect(res.body).to.have.property('status');
           expect(res.body).to.have.property('message');
           expect(res.body.status).to.equal('failed');
-          expect(res.body.message).to.equal('user not found');
+          expect(res.body.message).to.equal('login failed, user not found');
           done();
         });
     });
@@ -304,7 +301,7 @@ describe('Login Success', () => {
     });
 
     after(() => {
-      User.deleteMany({}).then(data => {})
+      User.deleteOne({email:'agung@mail.com'}).then(data => {})
     })
 
     it("should return token if user login succesfully", done => {
@@ -343,20 +340,18 @@ describe('Get current online user data', () => {
 
       let user = new User(dataNewUser)
 
-      return new Promise(resolve => {
         user.save().then(data => {
           token = jwt.sign({
             id: data._id,
             username: data.username
-          }, process.env.JWT_HASH)
-          resolve()
-        })
+          }, process.env.JWT_SECRET)
+        
       })
 
     });
 
     after(function () {
-      User.deleteMany({}).then(data => {})
+      User.deleteOne({email:'agung@mail.com'}).then(data => {})
     })
 
     it('should return current user data with properties id and username', done => {
@@ -367,11 +362,14 @@ describe('Get current online user data', () => {
           token
         })
         .end((err, res) => {
+          console.log('res.body', res.body)
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('status')
           expect(res.body).to.have.property('data')
-          expect(res.body.data).to.have.property('id')
-          expect(res.body.data).to.have.property('username')
+          expect(res.body.data).to.be.an('array')
+          expect(res.body.data[0]).to.have.property('_id')
+          expect(res.body.data[0]).to.have.property('username')
+          expect(res.body.data[0]).to.have.property('email')
           done()
         })
     })

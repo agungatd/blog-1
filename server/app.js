@@ -24,7 +24,10 @@ app.use(function(req, res, next) {
 	next();
 });
 
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:8080',
+  credentials: true
+}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -39,6 +42,46 @@ app.get('/', (req,res) => {
       message : `Server On`
   })
 })
+// stream file mp3
+const fs = require('fs')
+// const server = require('http').createServer();
+app.get('/text-to-speech', function(req, res) {
+  console.log('in text-to-speech route')
+  const path = `./output.mp3`
+  const stat = fs.statSync(path)
+  const fileSize = stat.size
+  const range = req.headers.range
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-")
+    const start = parseInt(parts[0], 10)
+    const end = parts[1] 
+      ? parseInt(parts[1], 10)
+      : fileSize-1
+    const chunksize = (end-start)+1
+    const file = fs.createReadStream(path, {start, end})
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'audio/mpeg',
+    }
+    res.writeHead(206, head);
+    file.pipe(res);
+    setTimeout(()=>{
+      fs.unlinkSync(path)
+    },2000)
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'audio/mpeg',
+    }
+    res.writeHead(200, head)
+    fs.createReadStream(path).pipe(res)
+    setTimeout(()=>{
+      fs.unlinkSync(path)
+    },2000)
+  }
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
