@@ -30,7 +30,7 @@ fitur unik: belum selesai (text-to-speech content article. baru sampai buat file
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/my-blog-1ea8c%40appspot.gserviceaccount.com"
 }
 
-## client: ./aset/config
+## client: .src/assets/config.js
 var config = {
   apiKey: "AIzaSyAEup1N4TaLrPH-6iAYIeFOyVzqDMZg4mk",
   authDomain: "blogging-web.firebaseapp.com",
@@ -42,3 +42,6 @@ var config = {
 firebase.initializeApp(config);
 
 export default firebase
+
+## Client google API key.js (in .src/assets/api_key.js)
+module.exports = 'AIzaSyAEup1N4TaLrPH-6iAYIeFOyVzqDMZg4mk'

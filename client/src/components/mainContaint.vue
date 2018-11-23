@@ -9,7 +9,15 @@
       <img id='image' :src=" article.image " alt="">
     </div>
     <hr>
-    <!-- <button class="btn btn-secondary" @click="textToSpeech">Text to Speech</button> -->
+    <h4>Translate Content to</h4>
+    <select v-model="choosenLang">
+      <option v-for='(lang, index) in listLang' :key="index" :value="lang.language">{{lang.name}}</option>
+    </select><br>
+    <button class="btn btn-secondary" @click="translate">Translate</button><br><hr>
+    <div v-if="showTranslation">
+      {{ translatedText }}
+      <hr>
+    </div>
     <div class='paragraf' id="paragraf" v-html="article.content" >
     </div>
     <h4>Related Videos:</h4>
@@ -121,7 +129,8 @@
   import comments from '@/components/comments.vue';
   import share from '@/components/share.vue'
   import notif from '@/components/notifMessage.vue'
-  import videosComp from '@/components/videos.vue'
+  import videosComp from '@/components/videos.vue';
+  import API_KEY from "../assets/api_key.js";
   
   // import db from '../assets/config.js'
 
@@ -143,7 +152,11 @@
         showErr: false,
         msg: '',
         videos: [],
-        text: 'Error when reading the HTML'
+        text: 'Error when reading the HTML',
+        listLang: [],
+        choosenLang: 'en',
+        showTranslation: false,
+        translatedText: 'Text Cannot be translated due to error in google translate server'
       }
     },
     components: {
@@ -282,15 +295,31 @@
         self.text = element.innerText;
         // console.log('text:', text)
       },
-      textToSpeech() {
+      getLang() {
+        let self = this
+        axios.get(`https://translation.googleapis.com/language/translate/v2/languages?target=en&key=${API_KEY}`)
+        .then((result) => {
+          self.listLang = result.data.data.languages
+        }).catch((err) => {
+          console.log(err.response)
+        });
+      },
+      translate() {
         let self = this
         var element = document.getElementById('paragraf');
         self.text = element.innerText;
-        
-        axios.post(`${this.$server}/articles/text-to-speech`, {
-          text: self.text
-        }).then((result) => {
-          console.log(result)
+        let lang = self.choosenLang
+        // console.log(self.text, '//', API_KEY)
+        axios.get(`https://translation.googleapis.com/language/translate/v2/detect?q=${self.text}&key=${API_KEY}`)
+        .then((result) => {
+          let sourceLang = result.data.data.detections[0][0].language
+          axios.get(`https://translation.googleapis.com/language/translate/v2/?q=${self.text}&source=${sourceLang}&target=${lang}&key=${API_KEY}`)
+          .then((result) => {
+            self.translatedText = result.data.data.translations[0].translatedText
+            self.showTranslation = true
+          }).catch((err) => {
+            console.log(err.response)
+          });
         }).catch((err) => {
           console.log(err.response)
         });
@@ -305,6 +334,7 @@
       
     },
     created() {
+      this.getLang()
       this.refreshLobby()
       this.showComments = false
     },
@@ -316,6 +346,7 @@
     watch: {
       getParamsId: function(val) {
         this.getArticle(val)
+        this.getLang()
       },
       showMsg(val) {
         if(val) setTimeout(()=>{

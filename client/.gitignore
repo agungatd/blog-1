@@ -3,6 +3,7 @@ node_modules
 /dist
 keyfile.json
 config.js
+api_key.js
 
 # local env files
 .env.local
