@@ -9,7 +9,9 @@
       <div v-for='comment in allComments' :key='comment._id' class='commentBox'>
         <div>posted on: {{ getDate(comment.createdAt) }}</div>
         <div style='text-align:left; padding-left:5px;'>{{ comment.commentator.username }} commented:</div>
-        <div style='text-align:right ; padding-right:5px;'>{{ comment.message }}</div>
+        <div style='text-align:right ; padding-right:5px;'>{{ comment.message}}</div>
+        <hr>
+        <div v-if="comment.commentator._id === activeUserId"><span style="color: red; cursor:pointer;" @click="deleteComment(comment._id)">Delete Comment</span></div>
       </div>
     </div>  
    
@@ -23,6 +25,7 @@
     return{
       isLogin : localStorage.getItem('token'),
       username: localStorage.getItem('username'),
+      activeUserId: localStorage.getItem('userId'),
       comment: '',
       allComments: []
     }    
@@ -70,6 +73,20 @@
         console.log(err)
       });
     },
+    deleteComment(id) {
+      let self = this
+      axios.delete(`${this.$server}/comments/${id}`, {
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      .then((result) => {
+        console.log('success deleting comment', )
+          self.showAllComments(self.article._id)
+      }).catch((err) => {
+        console.log(err.response)
+      });
+    }
   }
   }
 </script>
