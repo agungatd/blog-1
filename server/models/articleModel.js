@@ -30,7 +30,8 @@ const articleSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],
-    views: Number
+    views: Number,
+    default: 0
 }, {
     timestamps: true
 });

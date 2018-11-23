@@ -18,14 +18,19 @@
       <h6 v-if='isLogin'>Bitcoin Price Index</h6>
       {{info.data.bpi.USD.code}} : {{info.data.bpi.USD.rate}}
       -->
-
-    <div class="row">
-      <div class="main-content col-md-9">
-        <MainContaint  :isLogin='isLogin' :getDate='getDate' :randomArticle='randomArticle'></MainContaint>
-      </div>
-      <div class="side-bar col-md-3">
-        <SideBar :isLogin='isLogin' :getDate='getDate' ></SideBar>
-        <Popular :isLogin='isLogin' :getDate='getDate' />
+    <div v-if="createArticlePage">
+      <br><br>
+      <create :isLogin='isLogin'/>
+    </div>
+    <div v-else>
+      <div class="row">
+        <div class="main-content col-md-9">
+          <MainContaint  :isLogin='isLogin' :getDate='getDate' :randomArticle='randomArticle'></MainContaint>
+        </div>
+        <div class="side-bar col-md-3">
+          <SideBar :isLogin='isLogin' :getDate='getDate' ></SideBar>
+          <Popular :isLogin='isLogin' :getDate='getDate' />
+        </div>
       </div>
     </div>
   </div>
@@ -35,10 +40,11 @@
 // @ is an alias to /src
 import MainContaint from "@/components/mainContaint.vue";
 import SideBar from "@/components/sideBar.vue";
-import Popular from "@/components/popular.vue"
+import Popular from "@/components/popular.vue";
+import create from "@/components/CreateArticle.vue"
 
 export default {
-  props: ['isLogin', 'getDate'],
+  props: ['isLogin', 'getDate', 'createArticlePage'],
   name: 'home',
   data () {
     return {
@@ -53,7 +59,7 @@ export default {
     
   },
   components: { 
-    MainContaint, SideBar, Popular
+    MainContaint, SideBar, Popular, create
   },
   methods: {
     getRandomArticle() {

@@ -9,7 +9,7 @@
       <img id='image' :src=" article.image " alt="">
     </div>
     <hr>
-    <button class="btn btn-secondary" @click="textToSpeech">Text to Speech</button>
+    <!-- <button class="btn btn-secondary" @click="textToSpeech">Text to Speech</button> -->
     <div class='paragraf' id="paragraf" v-html="article.content" >
     </div>
     <h4>Related Videos:</h4>

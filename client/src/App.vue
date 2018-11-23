@@ -10,9 +10,9 @@
           <i class="fa fa-bars"></i>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
-          <span> <router-link to="/">Home</router-link> &nbsp;|&nbsp; </span>
+          <span @click="goHome"> <router-link to="/" >Home</router-link> &nbsp;|&nbsp; </span>
           <span v-if='!isLogin'> <router-link to="/login" >Login</router-link> &nbsp;|&nbsp; </span>
-          <span v-if='isLogin'> <router-link to="/article">Create Article</router-link> &nbsp;|&nbsp; </span>
+          <span id="create" v-if='isLogin' @click="goCreate" style="cursor: pointer;" :style="{color: activeColor}"> <strong>Create Article</strong> &nbsp;|&nbsp; </span>
           <span v-if='isLogin'> <router-link to="/chat">Chatting</router-link>  &nbsp;|&nbsp; </span>
           <span v-if='isLogin'> <router-link to="/profile">Profile</router-link> </span>
         </div>
@@ -26,7 +26,7 @@
     </nav>
   </div>
   <div class='container'>
-     <router-view :hasLoggedIn='hasLoggedIn' :isLogin='isLogin' :userId='userId' :getDate='getDate' :showComments='showComments' />
+     <router-view :hasLoggedIn='hasLoggedIn' :isLogin='isLogin' :userId='userId' :getDate='getDate' :showComments='showComments' :createArticlePage='createArticlePage'/>
   </div>
     
   </div>
@@ -40,7 +40,9 @@
       isLogin : false,
       username: '',
       userId: '',
-      showComments: false
+      showComments: false,
+      createArticlePage: false,
+      activeColor: 'black'
     }    
   },
   components: {
@@ -63,12 +65,22 @@
     getDate(isoDate) {
       let date = new Date(isoDate);
       return date.getDate()+'-' + (date.getMonth()+1) + '-'+date.getFullYear();
+    },
+    goHome() {
+      console.log('go home..')
+      this.createArticlePage = false
+      this.activeColor = 'black'
+    },
+    goCreate() {
+      this.createArticlePage = true
+      this.activeColor = 'brown';
     }
 
   },
   created() {
     if(localStorage.getItem('token')) {
       this.hasLoggedIn()
+      
     }
   }
 };
